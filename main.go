@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+// Global cache with 30min ttl
+var cache = newAircraftCache(30 * time.Minute)
+
 func main() {
 	// Initialise the router
 	mux := initRoutes()
