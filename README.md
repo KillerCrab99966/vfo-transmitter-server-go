@@ -15,12 +15,24 @@ Same functions and parameters as the original: [https://github.com/jonbeckett/vf
 
 Each endpoint has a version with no suffix and a version with the original suffix for backwards-compatibility.
 
-### Transmit
+### Data Ingestion
 
 ```
 GET /transmit
 GET /transmit.php
 ```
+Receives aircraft position data from the VFO Transmitter client.
+
+### Data APIs
+
+```
+GET /radar_data
+GET /radar_data.php
+
+GET /status_json
+GET /status_json.php
+```
+Both return the aircraft array as JSON, with the same fields as the original `status_json.php` ([https://github.com/jonbeckett/vfo-transmitter-server/wiki/api-endpoints#get-status_jsonphp](https://github.com/jonbeckett/vfo-transmitter-server/wiki/api-endpoints#get-status_jsonphp)).
 
 ## Related Projects
 

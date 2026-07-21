@@ -7,7 +7,7 @@ import (
 )
 
 // Global cache with 30min ttl
-var cache = newAircraftCache(30 * time.Second)
+var cache = newAircraftCache(30 * time.Minute)
 
 func main() {
 	// Initialise the router
@@ -15,7 +15,7 @@ func main() {
 
 	// Create the server
 	server := &http.Server{
-		Addr:         ":8080", // EDIT IF DESIRED
+		Addr:         ":8080",
 		Handler:      mux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,

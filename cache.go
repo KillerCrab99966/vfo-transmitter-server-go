@@ -7,16 +7,38 @@ import (
 
 type aircraftCache struct {
 	mu   sync.Mutex
-	data map[string]aircraftData
+	data map[string]AircraftData
 	ages map[string]time.Time
 	ttl  time.Duration
+}
+
+type AircraftData struct {
+	UserPin           string    `json:"-"`
+	Callsign          string    `json:"callsign"`
+	AircraftType      string    `json:"aircraft_type"`
+	PilotName         string    `json:"pilot_name"`
+	GroupName         string    `json:"group_name"`
+	MsfsServer        string    `json:"msfs_server"`
+	TransponderCode   string    `json:"transponder_code"`
+	Latitude          string    `json:"latitude"`
+	Longitude         string    `json:"longitude"`
+	Altitude          string    `json:"altitude"`
+	Heading           string    `json:"heading"`
+	Airspeed          string    `json:"airspeed"`
+	Groundspeed       string    `json:"groundspeed"`
+	TouchdownVelocity string    `json:"touchdown_velocity"`
+	Notes             string    `json:"notes"`
+	Version           string    `json:"version"`
+	Timestamp         time.Time `json:"-"`
+	Created           time.Time `json:"-"`
+	Modified          time.Time `json:"-"`
 }
 
 // newAircraftCache returns an [aircraftCache] pointer
 // and starts a background ttl monitor.
 func newAircraftCache(ttl time.Duration) *aircraftCache {
 	cache := &aircraftCache{
-		data: make(map[string]aircraftData),
+		data: make(map[string]AircraftData),
 		ages: make(map[string]time.Time),
 		ttl:  ttl,
 	}
@@ -27,7 +49,7 @@ func newAircraftCache(ttl time.Duration) *aircraftCache {
 	return cache
 }
 
-func (c *aircraftCache) set(callsign string, data aircraftData) {
+func (c *aircraftCache) set(callsign string, data AircraftData) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -35,7 +57,7 @@ func (c *aircraftCache) set(callsign string, data aircraftData) {
 	c.ages[callsign] = time.Now()
 }
 
-func (c *aircraftCache) get(callsign string) (aircraftData, bool) {
+func (c *aircraftCache) get(callsign string) (AircraftData, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 

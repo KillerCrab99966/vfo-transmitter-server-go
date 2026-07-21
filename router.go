@@ -13,5 +13,11 @@ func initRoutes() *http.ServeMux {
 	// mux.HandleFunc("POST /transmit", handlePostTransmit)
 	// mux.HandleFunc("POST /transmit.php", handlePostTransmit)
 
+	// Both JSON endpoints give same data - both kept for backwards-compatibility
+	mux.HandleFunc("GET /radar_data", handleJSON)
+	mux.HandleFunc("GET /radar_data.php", handleJSON)
+	mux.HandleFunc("GET /status_json", handleJSON)
+	mux.HandleFunc("GET /status_json.php", handleJSON)
+
 	return mux
 }
