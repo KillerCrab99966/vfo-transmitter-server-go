@@ -4,15 +4,22 @@ A real-time aircraft tracking server for Microsoft Flight Simulator and X-Plane.
 
 This is my Golang port of Jonathan Beckett's PHP-Based server.
 
+## TODOs
+
+- Rate limiting
+- Flexability with a JSON config file or env variables
+
 ## API Endpoints
 
 Same functions and parameters as the original: [https://github.com/jonbeckett/vfo-transmitter-server/wiki/api-endpoints](https://github.com/jonbeckett/vfo-transmitter-server/wiki/api-endpoints)
 
+Each endpoint has a version with no suffix and a version with the original suffix for backwards-compatibility.
+
 ### Transmit
 
 ```
-GET /api/transmit
-POST /api/transmit
+GET /transmit
+GET /transmit.php
 ```
 
 ## Related Projects
