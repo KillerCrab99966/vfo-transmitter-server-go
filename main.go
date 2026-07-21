@@ -7,7 +7,7 @@ import (
 )
 
 // Global cache with 30min ttl
-var cache = newAircraftCache(30 * time.Minute)
+var cache = newAircraftCache(30 * time.Second)
 
 func main() {
 	// Initialise the router

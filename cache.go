@@ -52,7 +52,7 @@ func (c *aircraftCache) ttlMonitor(interval time.Duration) {
 		expired := []string{}
 
 		for callsign, age := range c.ages {
-			if age.Add(c.ttl).After(time.Now()) {
+			if age.Add(c.ttl).Before(time.Now()) {
 				// The callsign is expired
 				expired = append(expired, callsign)
 			}
@@ -67,6 +67,7 @@ func (c *aircraftCache) ttlMonitor(interval time.Duration) {
 		c.mu.Lock()
 		for _, callsign := range expired {
 			delete(c.data, callsign)
+			delete(c.ages, callsign)
 		}
 		c.mu.Unlock()
 	}
