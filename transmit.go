@@ -11,8 +11,8 @@ import (
 // Leave empty to disable pin authentication
 var serverPin = ""
 
-func handleGetTransmit(w http.ResponseWriter, r *http.Request) {
-	userPin := GetOrElse(r.URL.Query()["Pin"], 0, "")
+func handleTransmit(w http.ResponseWriter, r *http.Request) {
+	userPin := getOrDefault(r.URL.Query()["Pin"], 0, "")
 
 	// If the server pin is used, the user pin must match the server pin
 	if len(serverPin) != 0 && userPin != serverPin {
@@ -23,21 +23,21 @@ func handleGetTransmit(w http.ResponseWriter, r *http.Request) {
 	// Get the data from the request
 	now := time.Now()
 	aircraft := AircraftData{
-		Callsign:          GetOrElse(r.URL.Query()["Callsign"], 0, ""),
-		AircraftType:      GetOrElse(r.URL.Query()["AircraftType"], 0, ""),
-		PilotName:         GetOrElse(r.URL.Query()["PilotName"], 0, ""),
-		GroupName:         GetOrElse(r.URL.Query()["GroupName"], 0, ""),
-		MsfsServer:        GetOrElse(r.URL.Query()["MSFSServer"], 0, ""),
-		TransponderCode:   GetOrElse(r.URL.Query()["TransponderCode"], 0, ""),
-		Latitude:          GetOrElse(r.URL.Query()["Latitude"], 0, "0"),
-		Longitude:         GetOrElse(r.URL.Query()["Longitude"], 0, "0"),
-		Altitude:          GetOrElse(r.URL.Query()["Altitude"], 0, "0"),
-		Heading:           GetOrElse(r.URL.Query()["Heading"], 0, "0"),
-		Airspeed:          GetOrElse(r.URL.Query()["Airspeed"], 0, "0"),
-		Groundspeed:       GetOrElse(r.URL.Query()["Groundspeed"], 0, "0"),
-		TouchdownVelocity: GetOrElse(r.URL.Query()["TouchdownVelocity"], 0, "0"),
-		Notes:             GetOrElse(r.URL.Query()["Notes"], 0, ""),
-		Version:           GetOrElse(r.URL.Query()["Version"], 0, "1.0.0.n"),
+		Callsign:          parameterOrDefault(r, "Callsign", ""),
+		AircraftType:      parameterOrDefault(r, "AircraftType", ""),
+		PilotName:         parameterOrDefault(r, "PilotName", ""),
+		GroupName:         parameterOrDefault(r, "GroupName", ""),
+		MsfsServer:        parameterOrDefault(r, "MSFSServer", ""),
+		TransponderCode:   parameterOrDefault(r, "TransponderCode", ""),
+		Latitude:          parameterOrDefault(r, "Latitude", "0"),
+		Longitude:         parameterOrDefault(r, "Longitude", "0"),
+		Altitude:          parameterOrDefault(r, "Altitude", "0"),
+		Heading:           parameterOrDefault(r, "Heading", "0"),
+		Airspeed:          parameterOrDefault(r, "Airspeed", "0"),
+		Groundspeed:       parameterOrDefault(r, "Groundspeed", "0"),
+		TouchdownVelocity: parameterOrDefault(r, "TouchdownVelocity", "0"),
+		Notes:             parameterOrDefault(r, "Notes", ""),
+		Version:           parameterOrDefault(r, "Version", "1.0.0.n"),
 		Modified:          now,
 	}
 
@@ -75,8 +75,23 @@ func handleGetTransmit(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "updated")
 }
 
-// GetOrElse returns the slice element at index, or the provided default value if out of bounds.
-func GetOrElse[T any](slice []T, index int, defaultValue T) T {
+// parameterOrDefault returns the GET or POST parameter or the provided default value.
+func parameterOrDefault(r *http.Request, parameter string, defaultValue string) string {
+	queryParams := r.URL.Query()
+	if values, exists := queryParams[parameter]; exists {
+		return getOrDefault(values, 0, defaultValue)
+	}
+
+	r.ParseForm()
+	if values, exists := r.PostForm[parameter]; exists {
+		return getOrDefault(values, 0, defaultValue)
+	}
+
+	return defaultValue
+}
+
+// getOrDefault returns the slice element at index, or the provided default value if out of bounds.
+func getOrDefault[T any](slice []T, index int, defaultValue T) T {
 	if index < 0 || index >= len(slice) {
 		return defaultValue
 	}

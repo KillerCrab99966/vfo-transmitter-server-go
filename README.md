@@ -20,6 +20,9 @@ Each endpoint has a version with no suffix and a version with the original suffi
 ```
 GET /transmit
 GET /transmit.php
+
+POST /transmit
+POST /transmit.php
 ```
 Receives aircraft position data from the VFO Transmitter client.
 
