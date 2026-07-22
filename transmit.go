@@ -21,7 +21,7 @@ func handleTransmit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the data from the request
-	now := time.Now()
+	now := time.Now().UTC()
 	aircraft := AircraftData{
 		Callsign:          parameterOrDefault(r, "Callsign", ""),
 		AircraftType:      parameterOrDefault(r, "AircraftType", ""),

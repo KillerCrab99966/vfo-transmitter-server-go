@@ -56,7 +56,7 @@ func (c *aircraftCache) set(callsign string, data AircraftData) {
 
 	item := cacheItem{
 		data:        data,
-		lastUpdated: time.Now(),
+		lastUpdated: time.Now().UTC(),
 	}
 
 	c.items[callsign] = item
@@ -76,7 +76,7 @@ func (c *aircraftCache) startTTLMonitor(interval time.Duration) {
 	defer t.Stop()
 
 	for range t.C {
-		now := time.Now()
+		now := time.Now().UTC()
 
 		c.mu.Lock()
 		for callsign, item := range c.items {
