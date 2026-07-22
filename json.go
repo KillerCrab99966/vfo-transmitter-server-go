@@ -17,7 +17,7 @@ type AircraftJSON struct {
 func handleJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	if len(cache.data) == 0 {
+	if len(cache.items) == 0 {
 		fmt.Fprint(w, "[]")
 		return
 	}
@@ -25,8 +25,11 @@ func handleJSON(w http.ResponseWriter, r *http.Request) {
 	aircraft := []AircraftJSON{}
 
 	// Collect the connected aircraft into the slice
-	cache.mu.Lock()
-	for _, data := range cache.data {
+	cache.mu.RLock()
+	for _, data := range cache.items {
+		// We onl need the data, not the age
+		data := data.data
+
 		timeOnline := formatTimeOnline(time.Since(data.Created))
 		sinceLast := time.Since(data.Modified).Seconds()
 		modified := formatModified(data.Modified)
@@ -38,7 +41,7 @@ func handleJSON(w http.ResponseWriter, r *http.Request) {
 			Modified:               modified,
 		})
 	}
-	cache.mu.Unlock()
+	cache.mu.RUnlock()
 
 	jsonData, err := json.Marshal(aircraft)
 

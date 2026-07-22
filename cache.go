@@ -6,14 +6,17 @@ import (
 )
 
 type aircraftCache struct {
-	mu   sync.Mutex
-	data map[string]AircraftData
-	ages map[string]time.Time
-	ttl  time.Duration
+	mu    sync.RWMutex
+	items map[string]cacheItem
+	ttl   time.Duration
+}
+
+type cacheItem struct {
+	data        AircraftData
+	lastUpdated time.Time
 }
 
 type AircraftData struct {
-	UserPin           string    `json:"-"`
 	Callsign          string    `json:"callsign"`
 	AircraftType      string    `json:"aircraft_type"`
 	PilotName         string    `json:"pilot_name"`
@@ -29,7 +32,6 @@ type AircraftData struct {
 	TouchdownVelocity string    `json:"touchdown_velocity"`
 	Notes             string    `json:"notes"`
 	Version           string    `json:"version"`
-	Timestamp         time.Time `json:"-"`
 	Created           time.Time `json:"-"`
 	Modified          time.Time `json:"-"`
 }
@@ -38,13 +40,12 @@ type AircraftData struct {
 // and starts a background ttl monitor.
 func newAircraftCache(ttl time.Duration) *aircraftCache {
 	cache := &aircraftCache{
-		data: make(map[string]AircraftData),
-		ages: make(map[string]time.Time),
-		ttl:  ttl,
+		items: make(map[string]cacheItem),
+		ttl:   ttl,
 	}
 
 	// Monitor once a second
-	go cache.ttlMonitor(time.Second)
+	go cache.startTTLMonitor(time.Second)
 
 	return cache
 }
@@ -53,43 +54,36 @@ func (c *aircraftCache) set(callsign string, data AircraftData) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.data[callsign] = data
-	c.ages[callsign] = time.Now()
+	item := cacheItem{
+		data:        data,
+		lastUpdated: time.Now(),
+	}
+
+	c.items[callsign] = item
 }
 
-func (c *aircraftCache) get(callsign string) (AircraftData, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+func (c *aircraftCache) get(callsign string) (item AircraftData, ok bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 
-	data, ok := c.data[callsign]
+	data, ok := c.items[callsign]
 
-	return data, ok
+	return data.data, ok
 }
 
-func (c *aircraftCache) ttlMonitor(interval time.Duration) {
-	for {
-		time.Sleep(interval)
+func (c *aircraftCache) startTTLMonitor(interval time.Duration) {
+	t := time.NewTicker(interval)
+	defer t.Stop()
 
-		// Slice to store expired callsigns
-		expired := []string{}
+	for range t.C {
+		now := time.Now()
 
-		for callsign, age := range c.ages {
-			if age.Add(c.ttl).Before(time.Now()) {
-				// The callsign is expired
-				expired = append(expired, callsign)
-			}
-		}
-
-		if len(expired) == 0 {
-			// There are no expired callsigns
-			continue
-		}
-
-		// Delete the expired data
 		c.mu.Lock()
-		for _, callsign := range expired {
-			delete(c.data, callsign)
-			delete(c.ages, callsign)
+		for callsign, item := range c.items {
+			if item.lastUpdated.Add(c.ttl).Before(now) {
+				// Delete the expired item
+				delete(c.items, callsign)
+			}
 		}
 		c.mu.Unlock()
 	}

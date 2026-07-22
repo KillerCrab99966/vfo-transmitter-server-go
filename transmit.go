@@ -12,9 +12,17 @@ import (
 var serverPin = ""
 
 func handleGetTransmit(w http.ResponseWriter, r *http.Request) {
+	userPin := GetOrElse(r.URL.Query()["Pin"], 0, "")
+
+	// If the server pin is used, the user pin must match the server pin
+	if len(serverPin) != 0 && userPin != serverPin {
+		fmt.Fprint(w, "invalid pin")
+		return
+	}
+
 	// Get the data from the request
+	now := time.Now()
 	aircraft := AircraftData{
-		UserPin:           GetOrElse(r.URL.Query()["Pin"], 0, ""),
 		Callsign:          GetOrElse(r.URL.Query()["Callsign"], 0, ""),
 		AircraftType:      GetOrElse(r.URL.Query()["AircraftType"], 0, ""),
 		PilotName:         GetOrElse(r.URL.Query()["PilotName"], 0, ""),
@@ -30,13 +38,7 @@ func handleGetTransmit(w http.ResponseWriter, r *http.Request) {
 		TouchdownVelocity: GetOrElse(r.URL.Query()["TouchdownVelocity"], 0, "0"),
 		Notes:             GetOrElse(r.URL.Query()["Notes"], 0, ""),
 		Version:           GetOrElse(r.URL.Query()["Version"], 0, "1.0.0.n"),
-		Timestamp:         time.Now(),
-	}
-
-	// If the server pin is used, the user pin must match the server pin
-	if len(serverPin) != 0 && aircraft.UserPin != serverPin {
-		fmt.Fprint(w, "invalid pin")
-		return
+		Modified:          now,
 	}
 
 	// Default groundspeed to airspeed if it is not supplied
@@ -65,9 +67,8 @@ func handleGetTransmit(w http.ResponseWriter, r *http.Request) {
 	if data, ok := cache.get(aircraft.Callsign); ok {
 		aircraft.Created = data.Created
 	} else {
-		aircraft.Created = time.Now()
+		aircraft.Created = now
 	}
-	aircraft.Modified = time.Now()
 
 	cache.set(aircraft.Callsign, aircraft)
 
