@@ -1,8 +1,11 @@
 # Virtual Flight Online Transmitter Server - Golang version
 
-A real-time aircraft tracking server for Microsoft Flight Simulator and X-Plane. Receives position data from transmitter clients and serves it via an interactive web-based radar display.
+This repository is a complete backend port of the Jonathan Beckett's [Virtual Flight Online Transmitter Server](https://github.com/jonbeckett/vfo-transmitter-server) from PHP to Go.
 
-This is my Golang port of Jonathan Beckett's PHP-Based server.
+It is designed to be fully compatible with the MSFS and X-Plane clients as it maintains the same API.
+
+> A real-time aircraft tracking server for Microsoft Flight Simulator and X-Plane. Receives position data from transmitter clients and serves it via an interactive web-based radar display.
+
 
 ## TODOs
 
@@ -46,4 +49,5 @@ Both return the aircraft array as JSON, with the same fields as the original `st
 
 ## License
 
-Open source — for educational and simulation use.
+Same as original:
+> Open source — for educational and simulation use.
