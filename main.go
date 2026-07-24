@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,11 @@ import (
 
 // Global cache with 30min ttl
 var cache = newAircraftCache(30 * time.Minute)
+
+// Embed static files
+//
+//go:embed all:static
+var staticFiles embed.FS
 
 func main() {
 	// Initialise the router
