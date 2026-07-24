@@ -18,7 +18,7 @@ func initRoutes() *http.ServeMux {
 	mux.HandleFunc("POST /transmit", handleTransmit)
 	mux.HandleFunc("POST /transmit.php", handleTransmit)
 
-	// Both JSON endpoints give same data - both kept for backwards-compatibility
+	// Both JSON endpoints give same data for simplicity - both kept for backwards-compatibility
 	mux.HandleFunc("GET /radar_data", handleJSON)
 	mux.HandleFunc("GET /radar_data.php", handleJSON)
 	mux.HandleFunc("GET /status_json", handleJSON)
@@ -50,10 +50,14 @@ func initRoutes() *http.ServeMux {
 	fileServer := http.FileServer(http.FS(subFS))
 	mux.Handle("GET /", fileServer)
 
-	// Suffixless endpoints
+	// Suffixless and original endpoints
 	mux.Handle("GET /radar", serveHTML("radar.html"))
 	mux.Handle("GET /status", serveHTML("status.html"))
 	mux.Handle("GET /embed", serveHTML("embed.html"))
+
+	mux.Handle("GET /radar.php", serveHTML("radar.html"))
+	mux.Handle("GET /status.php", serveHTML("status.html"))
+	mux.Handle("GET /embed.php", serveHTML("embed.html"))
 
 	return mux
 }

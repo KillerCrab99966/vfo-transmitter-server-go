@@ -31,6 +31,7 @@ Both return the aircraft array as JSON, with the same fields as the original `st
 ```
 GET /radar
 GET /radar.html
+GET /radar.php
 ```
 Full-screen interactive radar.
 <br>
@@ -38,6 +39,7 @@ Full-screen interactive radar.
 ```
 GET /status
 GET /status.html
+GET /status.php
 ```
 Aircraft status dashboard.
 <br>
@@ -45,5 +47,6 @@ Aircraft status dashboard.
 ```
 GET /embed
 GET /embed.html
+GET /embed.php
 ```
 Minimal radar widget. Suitable for `<iframe>` embedding.
