@@ -50,3 +50,23 @@ GET /embed.html
 GET /embed.php
 ```
 Minimal radar widget. Suitable for `<iframe>` embedding.
+
+## Debug Pages
+
+Development tools — not for production exposure.
+<br>
+<br>
+```
+GET /debug_aircraft
+GET /debug_aircraft.html
+GET /debug_aircraft.php
+```
+Dumps raw cache position records to the browser.
+<br>
+<br>
+```
+GET /test_aircraft
+GET /test_aircraft.html
+GET /test_aircraft.php
+```
+Injects synthetic aircraft positions into APCu.
