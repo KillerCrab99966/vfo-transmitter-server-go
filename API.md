@@ -51,6 +51,16 @@ GET /embed.php
 ```
 Minimal radar widget. Suitable for `<iframe>` embedding.
 
+## Admin Pages
+
+```
+GET /apcu_manager
+GET /apcu_manager.php
+```
+Cache management UI. Optional `?action=` parameter:
+- `clear_all` — clears all Caches (aircraft positions, rate limits)
+- `clear_aircraft` — clears the aircraft positions cache
+
 ## Debug Pages
 
 Development tools — not for production exposure.

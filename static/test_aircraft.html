@@ -407,9 +407,7 @@
             showStatus('info', 'Clearing all aircraft data...');
 
             try {
-                const response = await fetch('apcu_manager?action=clear_aircraft', {
-                    method: 'POST'
-                });
+                const response = await fetch('apcu_manager?action=clear_aircraft');
 
                 if (response.ok) {
                     showStatus('success', 'All aircraft data cleared successfully!');

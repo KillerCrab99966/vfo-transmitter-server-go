@@ -59,6 +59,10 @@ func initRoutes() *http.ServeMux {
 	mux.Handle("GET /status.php", serveHTML("status.html"))
 	mux.Handle("GET /embed.php", serveHTML("embed.html"))
 
+	// Cache management
+	mux.HandleFunc("GET /apcu_manager", handleCacheManager)
+	mux.HandleFunc("GET /apcu_manager.php", handleCacheManager)
+
 	// Debug endpoints
 	mux.Handle("GET /debug_aircraft", serveHTML("debug_aircraft.html"))
 	mux.Handle("GET /test_aircraft", serveHTML("test_aircraft.html"))

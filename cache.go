@@ -71,6 +71,21 @@ func (c *aircraftCache) get(callsign string) (item AircraftData, ok bool) {
 	return data.data, ok
 }
 
+func (c *aircraftCache) clear() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Reinitialise the map to free memory
+	c.items = make(map[string]cacheItem)
+}
+
+func (c *aircraftCache) len() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return len(c.items)
+}
+
 func (c *aircraftCache) startTTLMonitor(interval time.Duration) {
 	t := time.NewTicker(interval)
 	defer t.Stop()
