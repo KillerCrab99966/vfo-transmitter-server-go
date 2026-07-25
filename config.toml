@@ -1,0 +1,8 @@
+# The address for the server to listen on
+address = "0.0.0.0:8080"
+
+# An optional pin to restrict who can submit data
+pin = ""
+
+# If the debug/development pages (`debug_aircraft` & `test_aircraft`) should be served
+debug = false

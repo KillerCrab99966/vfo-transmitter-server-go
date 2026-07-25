@@ -7,10 +7,6 @@ import (
 	"time"
 )
 
-// Server pin for authentication (set this to secure your endpoint).
-// Leave empty to disable pin authentication
-var serverPin = ""
-
 func handleTransmit(w http.ResponseWriter, r *http.Request) {
 	userPin := getOrDefault(r.URL.Query()["Pin"], 0, "")
 

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func initRoutes() *http.ServeMux {
+func initRoutes(debug bool) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Endpoints
@@ -68,11 +68,13 @@ func initRoutes() *http.ServeMux {
 	mux.HandleFunc("GET /apcu_manager.php", handleCacheManager)
 
 	// Debug endpoints
-	mux.Handle("GET /debug_aircraft", serveHTML("debug_aircraft.html"))
-	mux.Handle("GET /test_aircraft", serveHTML("test_aircraft.html"))
+	if debug {
+		mux.Handle("GET /debug_aircraft", serveHTML("debug_aircraft.html"))
+		mux.Handle("GET /test_aircraft", serveHTML("test_aircraft.html"))
 
-	mux.Handle("GET /debug_aircraft.php", serveHTML("debug_aircraft.html"))
-	mux.Handle("GET /test_aircraft.php", serveHTML("test_aircraft.html"))
+		mux.Handle("GET /debug_aircraft.php", serveHTML("debug_aircraft.html"))
+		mux.Handle("GET /test_aircraft.php", serveHTML("test_aircraft.html"))
+	}
 
 	return mux
 }
