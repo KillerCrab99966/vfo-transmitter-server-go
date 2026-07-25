@@ -28,6 +28,7 @@ type AircraftJSON struct {
 
 func handleJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if len(cache.items) == 0 {
 		fmt.Fprint(w, "[]")
