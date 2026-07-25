@@ -41,38 +41,9 @@ func handleJSON(w http.ResponseWriter, r *http.Request) {
 	for _, data := range cache.items {
 		// We only need the data, not the age
 		data := data.data
+		formatted := formatAircraft(data)
 
-		// Convert the touchdown velocity from ft/sec to fpm
-		tv, _ := strconv.ParseFloat(data.TouchdownVelocity, 64)
-		data.TouchdownVelocity = strconv.FormatFloat(tv*60, 'f', -1, 64)
-
-		lat, _ := strconv.ParseFloat(data.Latitude, 64)
-		dms := decToDMS(lat)
-		latFormatted := fmt.Sprintf("%d&deg; %d' %.2f\" %s", dms.d, dms.m, dms.s, cardinalLat(lat))
-
-		long, _ := strconv.ParseFloat(data.Longitude, 64)
-		dms = decToDMS(long)
-		longFormatted := fmt.Sprintf("%d&deg; %d' %.2f\" %s", dms.d, dms.m, dms.s, cardinalLong(long))
-
-		timeOnline := formatTimeOnline(time.Since(data.Created))
-		sinceLast := time.Since(data.Modified).Seconds()
-		modified := formatModified(data.Modified)
-
-		aircraft = append(aircraft, AircraftJSON{
-			AircraftData: data,
-
-			LatFormatted:         latFormatted,
-			LongFormatted:        longFormatted,
-			AltFormatted:         formatAndTrunc(data.Altitude),
-			HeadingFormatted:     formatAndTrunc(data.Heading),
-			AirspeedFormatted:    formatAndTrunc(data.Airspeed),
-			GroundspeedFormatted: formatAndTrunc(data.Groundspeed),
-			TDVelocityFormatted:  formatAndTrunc(data.TouchdownVelocity),
-
-			TimeOnline:             timeOnline,
-			SecondsSinceLastUpdate: int(sinceLast),
-			Modified:               modified,
-		})
+		aircraft = append(aircraft, formatted)
 	}
 	cache.mu.RUnlock()
 
@@ -85,6 +56,40 @@ func handleJSON(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprint(w, string(jsonData))
+}
+
+func formatAircraft(data AircraftData) AircraftJSON {
+	// Convert the touchdown velocity from ft/sec to fpm
+	tv, _ := strconv.ParseFloat(data.TouchdownVelocity, 64)
+	data.TouchdownVelocity = strconv.FormatFloat(tv*60, 'f', -1, 64)
+
+	lat, _ := strconv.ParseFloat(data.Latitude, 64)
+	dms := decToDMS(lat)
+	latFormatted := fmt.Sprintf("%d&deg; %d' %.2f\" %s", dms.d, dms.m, dms.s, cardinalLat(lat))
+
+	long, _ := strconv.ParseFloat(data.Longitude, 64)
+	dms = decToDMS(long)
+	longFormatted := fmt.Sprintf("%d&deg; %d' %.2f\" %s", dms.d, dms.m, dms.s, cardinalLong(long))
+
+	timeOnline := formatTimeOnline(time.Since(data.Created))
+	sinceLast := time.Since(data.Modified).Seconds()
+	modified := data.Modified.Format("2006-01-02 15:04:05")
+
+	return AircraftJSON{
+		AircraftData: data,
+
+		LatFormatted:         latFormatted,
+		LongFormatted:        longFormatted,
+		AltFormatted:         formatAndTrunc(data.Altitude),
+		HeadingFormatted:     formatAndTrunc(data.Heading),
+		AirspeedFormatted:    formatAndTrunc(data.Airspeed),
+		GroundspeedFormatted: formatAndTrunc(data.Groundspeed),
+		TDVelocityFormatted:  formatAndTrunc(data.TouchdownVelocity),
+
+		TimeOnline:             timeOnline,
+		SecondsSinceLastUpdate: int(sinceLast),
+		Modified:               modified,
+	}
 }
 
 func formatTimeOnline(d time.Duration) string {
@@ -101,12 +106,6 @@ func formatTimeOnline(d time.Duration) string {
 
 	// Format with leading zeros
 	return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
-}
-
-func formatModified(t time.Time) string {
-	y, m, d := t.Date()
-
-	return fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", y, m, d, t.Hour(), t.Minute(), t.Second())
 }
 
 type dms struct {

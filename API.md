@@ -25,6 +25,13 @@ GET /status_json
 GET /status_json.php
 ```
 Both return the aircraft array as JSON, with the same fields as the original `status_json.php` ([https://github.com/jonbeckett/vfo-transmitter-server/wiki/api-endpoints#get-status_jsonphp](https://github.com/jonbeckett/vfo-transmitter-server/wiki/api-endpoints#get-status_jsonphp)).
+<br>
+<br>
+```
+GET /ivao
+GET /ivao.php
+```
+Returns an IVAO Whazzup-compatible plain-text feed.
 
 ## Pages (HTML responses)
 

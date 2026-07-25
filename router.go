@@ -24,6 +24,10 @@ func initRoutes() *http.ServeMux {
 	mux.HandleFunc("GET /status_json", handleJSON)
 	mux.HandleFunc("GET /status_json.php", handleJSON)
 
+	// IVAO format
+	mux.HandleFunc("GET /ivao", handleIVAO)
+	mux.HandleFunc("GET /ivao.php", handleIVAO)
+
 	// Static files
 
 	// Strip the "static" prefix so files are served relative to root
