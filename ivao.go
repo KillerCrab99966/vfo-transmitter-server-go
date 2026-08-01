@@ -50,11 +50,11 @@ func handleIVAO(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllAircraft() []AircraftData {
-	cache.mu.RLock()
-	defer cache.mu.RUnlock()
+	acCache.mu.RLock()
+	defer acCache.mu.RUnlock()
 
 	var aircraft []AircraftData
-	for _, item := range cache.items {
+	for _, item := range acCache.items {
 		aircraftData := item.data
 		age := time.Since(aircraftData.Modified).Minutes()
 

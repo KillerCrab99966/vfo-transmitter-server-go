@@ -30,7 +30,7 @@ func handleJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	if len(cache.items) == 0 {
+	if len(acCache.items) == 0 {
 		fmt.Fprint(w, "[]")
 		return
 	}
@@ -38,15 +38,15 @@ func handleJSON(w http.ResponseWriter, r *http.Request) {
 	aircraft := []AircraftJSON{}
 
 	// Collect the connected aircraft into the slice
-	cache.mu.RLock()
-	for _, data := range cache.items {
+	acCache.mu.RLock()
+	for _, data := range acCache.items {
 		// We only need the data, not the age
 		data := data.data
 		formatted := formatAircraft(data)
 
 		aircraft = append(aircraft, formatted)
 	}
-	cache.mu.RUnlock()
+	acCache.mu.RUnlock()
 
 	jsonData, err := json.Marshal(aircraft)
 

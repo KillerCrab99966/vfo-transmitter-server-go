@@ -2147,9 +2147,6 @@ class RadarDisplay {
         });
 
         const airspaceBtn = document.createElement('button');
-
-		airspaceBtn.disabled = true; // REMOVE ONCE AIRSPACE DATA IMPLEMENTED
-
         airspaceBtn.className = 'toolbar-btn';
         airspaceBtn.innerHTML = '<i class="fas fa-vector-square"></i>';
         airspaceBtn.title = 'Toggle Airspace Sectors (B)';

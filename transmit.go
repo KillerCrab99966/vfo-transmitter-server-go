@@ -60,13 +60,13 @@ func handleTransmit(w http.ResponseWriter, r *http.Request) {
 	aircraft.Notes = regex.ReplaceAllString(aircraft.Notes, "")
 
 	// Check if aircraft already exists and preserve created time
-	if data, ok := cache.get(aircraft.Callsign); ok {
+	if data, ok := acCache.get(aircraft.Callsign); ok {
 		aircraft.Created = data.Created
 	} else {
 		aircraft.Created = now
 	}
 
-	cache.set(aircraft.Callsign, aircraft)
+	acCache.set(aircraft.Callsign, aircraft)
 
 	fmt.Fprint(w, "updated")
 }

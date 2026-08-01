@@ -12,12 +12,13 @@ func handleCacheManager(w http.ResponseWriter, r *http.Request) {
 	// Carry out action
 	switch getOrDefault(r.URL.Query()["action"], 0, "") {
 	case "clear_all":
-		cache.clear()
+		acCache.clear()
+		airpaceCache.clear()
 		message = "<p style='color: green;'>✅ Cache cleared successfully</p>"
 
 	case "clear_aircraft":
-		aircraft := cache.len()
-		cache.clear()
+		aircraft := acCache.len()
+		acCache.clear()
 		message = fmt.Sprintf("<p style='color: green;'>✅ Cleared %v aircraft position entries</p>", aircraft)
 	}
 
@@ -60,11 +61,12 @@ func handleCacheManager(w http.ResponseWriter, r *http.Request) {
 			<p><strong>VFO Cache Breakdown:</strong></p>
 			<ul>
 				<li>Aircraft Positions: %v</li>
+				<li>Airspace Data: %v</li>
 			</ul>
 		</div>
 
 		<hr>
 		<p><small>Last updated: %v</small></p>
 	</body>
-	</html>`, message, cache.len(), time.Now().UTC().String())
+	</html>`, message, acCache.len(), airpaceCache.len(), time.Now().UTC().String())
 }

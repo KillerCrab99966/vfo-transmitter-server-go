@@ -16,8 +16,11 @@ import (
 // Leave empty to disable pin authentication
 var serverPin = ""
 
-// Global cache with 30min ttl
-var cache = newAircraftCache(30 * time.Minute)
+// Global aircraft acCache with 30min ttl
+var acCache = newCache[AircraftData](30 * time.Minute)
+
+// Airspace data cache
+var airpaceCache = newCache[string](24 * time.Hour)
 
 // Embed static files
 //
@@ -27,6 +30,11 @@ var staticFiles embed.FS
 // If `development`, then `config.toml` is looked for in cwd,
 // otherwise `config.toml` is looked for in binary's path.
 var Environment = "development"
+
+// Global HTTP client for airspace data requests
+var client = &http.Client{
+	Timeout: 60 * time.Second,
+}
 
 func main() {
 	// Read the config.toml
@@ -40,8 +48,8 @@ func main() {
 	server := &http.Server{
 		Addr:         cfg.Addr,
 		Handler:      mux,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  60 * time.Second,
+		WriteTimeout: 60 * time.Second,
 	}
 
 	fmt.Println("Server listening on:", server.Addr)
@@ -64,7 +72,8 @@ func readConfig() Config {
 	if Environment == "development" {
 		configPath = "config.toml"
 		cwd, _ := os.Getwd()
-		fmt.Println("Looking for config in:", cwd)
+		fullPath := filepath.Join(cwd, "config.toml")
+		fmt.Println("Looking for config at:", fullPath)
 	} else {
 
 		// Get path to the running executable file
@@ -77,8 +86,8 @@ func readConfig() Config {
 		execDir := filepath.Dir(execPath)
 
 		// Build absolute path
-		fmt.Println("Looking for config in", execDir)
 		configPath = filepath.Join(execDir, "config.toml")
+		fmt.Println("Looking for config at:", configPath)
 	}
 
 	// Read file

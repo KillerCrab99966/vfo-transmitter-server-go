@@ -17,6 +17,8 @@ Receives aircraft position data from the VFO Transmitter client.
 
 ## Data APIs
 
+### External
+
 ```
 GET /radar_data
 GET /radar_data.php
@@ -32,6 +34,14 @@ GET /ivao
 GET /ivao.php
 ```
 Returns an IVAO Whazzup-compatible plain-text feed.
+
+### Internal
+
+```
+GET /airspace_data
+GET /airspace_data.php
+```
+Proxy for fetching airspace GeoJSON data. Called by `radar.js`.
 
 ## Pages (HTML responses)
 

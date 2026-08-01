@@ -63,6 +63,10 @@ func initRoutes(debug bool) *http.ServeMux {
 	mux.Handle("GET /status.php", serveHTML("status.html"))
 	mux.Handle("GET /embed.php", serveHTML("embed.html"))
 
+	// Airspace data proxy
+	mux.HandleFunc("GET /airspace_data", handleAirspaceData)
+	mux.HandleFunc("GET /airspace_data.php", handleAirspaceData)
+
 	// Cache management
 	mux.HandleFunc("GET /apcu_manager", handleCacheManager)
 	mux.HandleFunc("GET /apcu_manager.php", handleCacheManager)

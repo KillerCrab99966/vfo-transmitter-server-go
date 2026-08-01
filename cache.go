@@ -5,14 +5,14 @@ import (
 	"time"
 )
 
-type aircraftCache struct {
+type cache[T any] struct {
 	mu    sync.RWMutex
-	items map[string]cacheItem
+	items map[string]cacheItem[T]
 	ttl   time.Duration
 }
 
-type cacheItem struct {
-	data        AircraftData
+type cacheItem[T any] struct {
+	data        T
 	lastUpdated time.Time
 }
 
@@ -36,11 +36,11 @@ type AircraftData struct {
 	Modified          time.Time `json:"-"`
 }
 
-// newAircraftCache returns an [aircraftCache] pointer
-// and starts a background ttl monitor.
-func newAircraftCache(ttl time.Duration) *aircraftCache {
-	cache := &aircraftCache{
-		items: make(map[string]cacheItem),
+// newCache returns a [cache] pointer
+// and starts a background TTL monitor.
+func newCache[T any](ttl time.Duration) *cache[T] {
+	cache := &cache[T]{
+		items: make(map[string]cacheItem[T]),
 		ttl:   ttl,
 	}
 
@@ -50,43 +50,41 @@ func newAircraftCache(ttl time.Duration) *aircraftCache {
 	return cache
 }
 
-func (c *aircraftCache) set(callsign string, data AircraftData) {
+func (c *cache[T]) set(key string, data T) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	item := cacheItem{
+	c.items[key] = cacheItem[T]{
 		data:        data,
 		lastUpdated: time.Now().UTC(),
 	}
-
-	c.items[callsign] = item
 }
 
-func (c *aircraftCache) get(callsign string) (item AircraftData, ok bool) {
+func (c *cache[T]) get(key string) (item T, ok bool) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	data, ok := c.items[callsign]
+	data, ok := c.items[key]
 
 	return data.data, ok
 }
 
-func (c *aircraftCache) clear() {
+func (c *cache[T]) clear() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	// Reinitialise the map to free memory
-	c.items = make(map[string]cacheItem)
+	c.items = make(map[string]cacheItem[T])
 }
 
-func (c *aircraftCache) len() int {
+func (c *cache[T]) len() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return len(c.items)
 }
 
-func (c *aircraftCache) startTTLMonitor(interval time.Duration) {
+func (c *cache[T]) startTTLMonitor(interval time.Duration) {
 	t := time.NewTicker(interval)
 	defer t.Stop()
 

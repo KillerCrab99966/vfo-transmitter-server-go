@@ -1,6 +1,6 @@
 # Virtual Flight Online Transmitter Server - Golang version
 
-This repository is a complete backend port of the Jonathan Beckett's [Virtual Flight Online Transmitter Server](https://github.com/jonbeckett/vfo-transmitter-server) from PHP to Go.
+This repository is a complete backend port of Jonathan Beckett's [Virtual Flight Online Transmitter Server](https://github.com/jonbeckett/vfo-transmitter-server) from PHP to Go.
 
 It is designed to be fully compatible with the MSFS and X-Plane clients as it maintains the same API.
 
@@ -10,8 +10,6 @@ A real-time aircraft tracking server for Microsoft Flight Simulator and X-Plane.
 ## TODOs
 
 - Rate limiting
-- Airspace data
-	- Enable button once enabled ([static/js/radar.js:2151](static/js/radar.js#L2151))
 
 ## API Endpoints
 
