@@ -62,11 +62,12 @@ func handleCacheManager(w http.ResponseWriter, r *http.Request) {
 			<ul>
 				<li>Aircraft Positions: %v</li>
 				<li>Airspace Data: %v</li>
+				<li>Rate Limits: %v</li>
 			</ul>
 		</div>
 
 		<hr>
 		<p><small>Last updated: %v</small></p>
 	</body>
-	</html>`, message, acCache.len(), airpaceCache.len(), time.Now().UTC().String())
+	</html>`, message, acCache.len(), airpaceCache.len(), rateCache.len(), time.Now().UTC().String())
 }

@@ -7,10 +7,6 @@ It is designed to be fully compatible with the MSFS and X-Plane clients as it ma
 About the server:\
 A real-time aircraft tracking server for Microsoft Flight Simulator and X-Plane. Receives position data from transmitter clients and serves it via an interactive web-based radar display.
 
-## TODOs
-
-- Rate limiting
-
 ## API Endpoints
 
 See [API.md](API.md)

@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -48,6 +50,17 @@ func handleTransmit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check rate limiting
+	if rateLimit {
+		// NOTE: The RemoteAddr may not be the client's IP if this server
+		// is behind another proxy/s such as NGINX or Cloudflare.
+		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		if isRateLimited(aircraft.Callsign, ip) {
+			fmt.Fprint(w, "rate limited")
+			return
+		}
+	}
+
 	// Clean up the data (only allow alphanumeric characters, spaces and hyphens)
 	regex := regexp.MustCompile(`[^A-Za-z0-9. -]`)
 	aircraft.Callsign = regex.ReplaceAllString(aircraft.Callsign, "")
@@ -69,6 +82,25 @@ func handleTransmit(w http.ResponseWriter, r *http.Request) {
 	acCache.set(aircraft.Callsign, aircraft)
 
 	fmt.Fprint(w, "updated")
+}
+
+func getRateLimitKey(callsign, ip string) string {
+	ipFormatted := strings.ReplaceAll(ip, ".", "_")
+	return callsign + "_" + ipFormatted
+}
+
+func isRateLimited(callsign, ip string) bool {
+	rateKey := getRateLimitKey(callsign, ip)
+	lastUpdate, ok := rateCache.get(rateKey)
+
+	// 1 second minimum between updates
+	if ok && time.Since(lastUpdate) < time.Second {
+		return true
+	}
+
+	// Update rate limit timestamp
+	rateCache.set(rateKey, time.Now())
+	return false
 }
 
 // parameterOrDefault returns the GET or POST parameter or the provided default value.

@@ -12,15 +12,21 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
-// Server pin for authentication (set this to secure your endpoint).
-// Leave empty to disable pin authentication
+// Server pin for authentication. Disabled when empty.
 var serverPin = ""
+
+// Enable rate-limiting
+var rateLimit = true
 
 // Global aircraft acCache with 30min ttl
 var acCache = newCache[AircraftData](30 * time.Minute)
 
-// Airspace data cache
+// Airspace data and rate limit cache
 var airpaceCache = newCache[string](24 * time.Hour)
+var airspaceRateCache = newCache[int](time.Minute)
+
+// Rate limits cache
+var rateCache = newCache[time.Time](10 * time.Second)
 
 // Embed static files
 //
@@ -40,6 +46,7 @@ func main() {
 	// Read the config.toml
 	cfg := readConfig()
 	serverPin = cfg.Pin
+	rateLimit = cfg.RateLimit
 
 	// Initialise the router
 	mux := initRoutes(cfg.Debug)
@@ -60,9 +67,10 @@ func main() {
 }
 
 type Config struct {
-	Addr  string `toml:"address"`
-	Pin   string `toml:"pin"`
-	Debug bool   `toml:"debug"`
+	Addr      string `toml:"address"`
+	Pin       string `toml:"pin"`
+	RateLimit bool   `toml:"rate_limiting"`
+	Debug     bool   `toml:"debug"`
 }
 
 func readConfig() Config {

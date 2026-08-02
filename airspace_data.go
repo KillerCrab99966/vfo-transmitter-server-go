@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -15,10 +16,31 @@ import (
 	"strconv"
 )
 
+const rateLimitMax = 60 // 60 requests per minute
+
 func handleAirspaceData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Cache-Control", "public, max-age=86400")
+
+	// Rate limiting
+	if rateLimit {
+		clientIP, _, _ := net.SplitHostPort(r.RemoteAddr)
+		reqCount, ok := airspaceRateCache.get(clientIP)
+		if ok {
+			// Increment requests
+			airspaceRateCache.set(clientIP, reqCount+1)
+
+			if reqCount >= rateLimitMax {
+				w.WriteHeader(http.StatusTooManyRequests)
+				fmt.Fprint(w, `{"error":"Rate limit exceeded"}`)
+				return
+			}
+		} else {
+			// If the key does not exist, this is the first request
+			airspaceRateCache.set(clientIP, 1)
+		}
+	}
 
 	// Input validation
 	source := getOrDefault(r.URL.Query()["source"], 0, "faa")

@@ -4,5 +4,8 @@ address = "0.0.0.0:8080"
 # An optional pin to restrict who can submit data
 pin = ""
 
+# Enable rate-limiting
+rate_limiting = true
+
 # If the debug/development pages (`debug_aircraft` & `test_aircraft`) should be served
 debug = false
