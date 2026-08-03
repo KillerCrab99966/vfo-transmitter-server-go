@@ -16,7 +16,7 @@ import (
 var serverPin = ""
 
 // Enable rate-limiting
-var rateLimit = true
+var rateLimit = false
 
 // Global aircraft acCache with 30min ttl
 var acCache = newCache[AircraftData](30 * time.Minute)
@@ -34,7 +34,8 @@ var rateCache = newCache[time.Time](10 * time.Second)
 var staticFiles embed.FS
 
 // If `development`, then `config.toml` is looked for in cwd,
-// otherwise `config.toml` is looked for in binary's path.
+// if `production` then config is looked for in binary's path. If neither,
+// the program will panic.
 var Environment = "development"
 
 // Global HTTP client for airspace data requests
@@ -74,6 +75,11 @@ type Config struct {
 }
 
 func readConfig() Config {
+	// Check build environment
+	if Environment != "development" && Environment != "production" {
+		log.Fatalf("Invalid build: Environment must be 'development' or 'production', got %q", Environment)
+	}
+
 	var configPath string
 
 	// Get the path of the binary
@@ -83,6 +89,7 @@ func readConfig() Config {
 		fullPath := filepath.Join(cwd, "config.toml")
 		fmt.Println("Looking for config at:", fullPath)
 	} else {
+		// Production build
 
 		// Get path to the running executable file
 		execPath, err := os.Executable()
@@ -104,11 +111,11 @@ func readConfig() Config {
 		log.Fatalf("Failed to read config: %v", err)
 	}
 
-	// Unmarshal
+	// Unmarshal and parse
 	var cfg Config
 	err = toml.Unmarshal(data, &cfg)
 	if err != nil {
-		log.Fatalf("Error unmarshaling TOML: %v", err)
+		log.Fatalf("Error parsing TOML: %v", err)
 	}
 
 	fmt.Println("Config found and parsed!")
